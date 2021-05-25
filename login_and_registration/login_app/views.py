@@ -16,7 +16,9 @@ def register(request):
         return redirect('/')
     else:
         user = User.objects.register(request.POST)
-        return redirect('/')
+        request.session['user_id'] = user.id
+        messages.success(request, "Registration successful!")
+        return redirect('/success')
     
 def login(request):
     if request.method == "GET":
@@ -27,4 +29,10 @@ def logout(request):
     return redirect('/')
 
 def success(request):
-    return redirect('/')
+    if 'user_id' not in request.session:
+        return redirect('/')
+    user = User.objects.get(id=request.session['user_id'])
+    context = {
+        'user': user
+    }
+    return render(request, 'success.html')
